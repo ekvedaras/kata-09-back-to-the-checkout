@@ -1,15 +1,40 @@
 use std::collections::HashMap;
-use crate::stock::Item;
+use crate::stock::{Item};
 
 struct Checkout {
     total: u32,
     pricing_rules: HashMap<char, Item>,
+    items: Vec<char>,
 }
 
 impl Checkout {
     pub fn scan(&mut self, item: &char) {
-        // todo recalculate total instead of just adding
-        self.total += self.pricing_rules[item].unit_price.price;
+        self.items.push(*item);
+        self.recalculate_total();
+    }
+
+    fn recalculate_total(&mut self) {
+        self.total = 0;
+        let unique = self.items.iter().collect::<std::collections::HashSet<_>>();
+        let mut counts: HashMap<char, u32> = HashMap::new();
+        for item in unique {
+            counts.insert(*item, self.items.iter().filter(|i| **i == *item).count() as u32);
+        }
+
+        for (item, count) in counts {
+            let unit_price = self.pricing_rules[&item].unit_price.price;
+            let special_price = &self.pricing_rules[&item].special_price;
+
+            let mut quantity = count;
+            let mut price = 0;
+            if let Some(special_price) = special_price {
+                while quantity >= special_price.quantity {
+                    quantity -= special_price.quantity;
+                    price += special_price.price;
+                }
+            }
+            self.total += unit_price * quantity + price;
+        }
     }
 }
 
@@ -21,7 +46,7 @@ mod tests {
 
     fn default_pricing_rules() -> HashMap<char, Item> {
         Item::parse_list([
-            "A|50|3 for 100",
+            "A|50|3 for 130",
             "B|30|2 for 45",
             "C|20||",
             "D|15||",
@@ -32,6 +57,7 @@ mod tests {
         let mut checkout = Checkout {
             total: 0,
             pricing_rules: default_pricing_rules(),
+            items: vec![]
         };
         goods.chars().for_each(|item| checkout.scan(&item));
         checkout.total
@@ -58,7 +84,7 @@ mod tests {
 
     #[test]
     fn test_incremental() {
-        let mut checkout = Checkout { total: 0, pricing_rules: default_pricing_rules() };
+        let mut checkout = Checkout { total: 0, pricing_rules: default_pricing_rules(), items: vec![] };
         assert_eq!(0, checkout.total);
         checkout.scan(&'A');
         assert_eq!(50, checkout.total);

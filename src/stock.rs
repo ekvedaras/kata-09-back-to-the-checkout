@@ -3,11 +3,12 @@ use std::string::String;
 
 pub struct Item {
     pub unit_price: Price,
-    special_price: Option<Price>,
+    pub special_price: Option<Price>,
 }
 
+#[derive(Clone)]
 pub struct Price {
-    quantity: u32,
+    pub quantity: u32,
     pub price: u32,
 }
 
