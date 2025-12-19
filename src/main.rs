@@ -30,7 +30,7 @@ mod tests {
             "C|20||",
             "D|15||",
         ].join("\n").as_str()
-        )
+        ).unwrap()
     }
 
     fn price(goods: &str) -> u32 {
