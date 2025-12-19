@@ -2,7 +2,6 @@ use std::collections::HashMap;
 use std::string::String;
 
 pub struct Item {
-    pub sku: char,
     pub unit_price: Price,
     special_price: Option<Price>,
 }
@@ -18,7 +17,7 @@ impl Item {
             .split("\n")
             .map(|line| -> Result<(char, Item), String> {
                 let fields: Vec<&str> = line.split("|").collect();
-                if (fields.len() < 2) {
+                if fields.len() < 2 {
                     return Err(format!("Invalid line: {}", line));
                 }
 
@@ -43,7 +42,7 @@ impl Item {
                     }
                 });
 
-                Ok((sku, Item { sku, unit_price, special_price }))
+                Ok((sku, Item { unit_price, special_price }))
             })
             .collect()
     }

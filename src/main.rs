@@ -4,7 +4,7 @@ use crate::stock::Item;
 mod stock;
 
 fn main() {
-    println!("Hello, world!");
+    println!("TODO: accept items from stdin and print total price; optionally accept pricing table from a file.");
 }
 
 struct Checkout {
@@ -14,7 +14,7 @@ struct Checkout {
 
 impl Checkout {
     pub fn scan(&mut self, item: &char) {
-        // todo recalculate total instead of jsut adding
+        // todo recalculate total instead of just adding
         self.total += self.pricing_rules[item].unit_price.price;
     }
 }
@@ -29,8 +29,7 @@ mod tests {
             "B|30|2 for 45",
             "C|20||",
             "D|15||",
-        ].join("\n").as_str()
-        ).unwrap()
+        ].join("\n").as_str()).unwrap()
     }
 
     fn price(goods: &str) -> u32 {
